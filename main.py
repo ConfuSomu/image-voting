@@ -30,12 +30,23 @@ for root, dirs, _ in walk(ROOT_DIR):
                 print("-- Not image") # Debug
                 pass # Ignore non image files
         
-        # Rotate images based on EXIF data
-        images = [rotate(image) for image in images]
+        # Rotate images based on EXIF data and add attribute to tell if animated
+        rimages = []
+        taggedImages = []
+        for image in images:
+            rotated = rotate(image)
+            rimages.append(rotated)
+            if not is_animated(image):
+                taggedImages.append([rotated, False]) # Append rotated image
+            else:
+                taggedImages.append([image, True]) # Append original
+        del images # Stops being used from the point on
+        
+        #rimages = [rotate(image) for image in images]
         
         # Find the biggest height and total width
         height = width = 0
-        for image in images:            
+        for image in rimages:
             width += image.width
             if image.height > height:
                 height = image.height
@@ -46,21 +57,14 @@ for root, dirs, _ in walk(ROOT_DIR):
         
         # Create an image that has the [height of the biggest image in the dir] and the [width of all of the images combined in the dir]
         # If there is an animated image (GIF):
-        animated = False
-        for image in images:
-            print("current image: "+str(image)) # Debug
-            
-            if is_animated(image):
-                animated = image
-                print("-- is animated")
-            else:
-                print("-- not animated")
         
-        combineImages(canvas, images, animated)
+        combineImages(canvas, taggedImages)
+        
             # For each frame of the GIF:
                 # Place in the created image each of the dir's images and the current frame of the GIF
                 # Overlay the images with the text (black with 0.5 alpha) "HaHa" for the first image, "Yes" for the second, "No" for the third... (iMessage reactions)
                 # Save the image as a TIFF with the dir's name and current frame number
+                
         # Else:
             # Place in the created image each of the dir's images
             # Overlay the images with the text (black with 0.5 alpha) "HaHa" for the first image, "Yes" for the second, "No" for the third... (iMessage reactions for voting)

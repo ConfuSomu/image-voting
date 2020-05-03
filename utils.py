@@ -30,12 +30,49 @@ def rotate(im):
     
     return ImageOps.exif_transpose(im)
 
-def combineImages(canvas, images, animated):
+def combineImages(canvas, images):    
     # Place in the created image each of the dir's images and the current frame of the GIF
-    x = y = 0
+    x = 0
+    i = 0
+    EOFCount = 0
+    maxEOF = 0
     for image in images:
-        canvas.paste(image, (x,y))
-        x += image.width
-    canvas.save('/tmp/{}.png'.format(str(x))) # Debug
+        if image[1]: # is_animated attribut
+            maxEOF += 1
+    while not EOFCount >= maxEOF:
+        generated = canvas.copy()
+        
+        for image in images:
+            if image[1]: # is_animated attribut
+                try:
+                    # Try to seek each animated image
+                    image[0].seek(i)
+                except EOFError:
+                    image[0].seek(0)
+                    exceptCount += 1
+                    print("EOFError, count={}, maxEOF={}, len(images)={}".format(str(exceptCount),str(maxEOF),str(len(images))))
+            
+            print("Paste image")
+            
+            # Only rotate animated images, as non animated have been rotated
+#             if image[1]:
+#                 toPaste = rotate(image[0])
+#             else:
+#                 toPaste = image[0]
+            toPaste = image[0]
+            generated.paste(toPaste, (x,0))
+            x += toPaste.width
+        
+        # Save frames here to avoid memory exhaustion
+        print("Saving frame {}...".format(str(i)))
+        generated.save('/tmp/{},{}.png'.format(str(x),str(i)))
+        
+        EOFCount = 0
+        x = 0
+        i += 1
+        
+        # To avoid waiting for an eternity... (dev)
+        if i > 10:
+            break
     # Overlay the images with the text (black with 0.5 alpha) "HaHa" for the first image, "Yes" for the second, "No" for the third... (iMessage reactions)
     # Save the image as a TIFF with the dir's name and current frame number
