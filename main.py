@@ -7,8 +7,9 @@ from utils import is_animated, rotate, combineImages
 ROOT_DIR = 'images' # Directory containing subdirectories with images
 TEXT_OVERLAY = ['Love', 'Like', 'Dislike', 'Haha', '!!', '?'] # iMessage reactions
 
-IMAGE_MODE = 'RGB'
-IMAGE_COLOR = 0
+# Canvas parameters
+CANVAS_MODE = 'RGB'
+CANVAS_COLOR = 0
 
 # Walk in subdirectories (jour 1, jour 2, ...)
 for root, dirs, _ in walk(ROOT_DIR):
@@ -27,11 +28,12 @@ for root, dirs, _ in walk(ROOT_DIR):
             try:
                 images.append(Image.open(file))
             except OSError:
+                # Ignore non image files
                 print("-- Not image") # Debug
-                pass # Ignore non image files
+                pass
         
         # Rotate images based on EXIF data and add attribute to tell if animated
-        rimages = []
+        rimages = [] # This line and the line below can't be put on one line, as this causes a strange bug
         taggedImages = []
         for image in images:
             rotated = rotate(image)
@@ -39,10 +41,8 @@ for root, dirs, _ in walk(ROOT_DIR):
             if not is_animated(image):
                 taggedImages.append([rotated, False]) # Append rotated image
             else:
-                taggedImages.append([image, True]) # Append original
-        del images # Stops being used from the point on
-        
-        #rimages = [rotate(image) for image in images]
+                taggedImages.append([image, True]) # Append original image
+        del images # Unused
         
         # Find the biggest height and total width
         height = width = 0
@@ -53,19 +53,6 @@ for root, dirs, _ in walk(ROOT_DIR):
         print("biggest height: {}, total width: {}".format(height, width))
         
         # Create a canvas image that will contain the other images
-        canvas = Image.new(IMAGE_MODE, (width, height), IMAGE_COLOR)
-        
-        # Create an image that has the [height of the biggest image in the dir] and the [width of all of the images combined in the dir]
-        # If there is an animated image (GIF):
+        canvas = Image.new(CANVAS_MODE, (width, height), CANVAS_COLOR)
         
         combineImages(canvas, taggedImages)
-        
-            # For each frame of the GIF:
-                # Place in the created image each of the dir's images and the current frame of the GIF
-                # Overlay the images with the text (black with 0.5 alpha) "HaHa" for the first image, "Yes" for the second, "No" for the third... (iMessage reactions)
-                # Save the image as a TIFF with the dir's name and current frame number
-                
-        # Else:
-            # Place in the created image each of the dir's images
-            # Overlay the images with the text (black with 0.5 alpha) "HaHa" for the first image, "Yes" for the second, "No" for the third... (iMessage reactions for voting)
-            # Save the image as a TIFF with the dir's name

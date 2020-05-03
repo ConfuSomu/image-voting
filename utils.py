@@ -31,11 +31,8 @@ def rotate(im):
     return ImageOps.exif_transpose(im)
 
 def combineImages(canvas, images):    
-    # Place in the created image each of the dir's images and the current frame of the GIF
-    x = 0
-    i = 0
-    EOFCount = 0
-    maxEOF = 0
+    # Combine images on the canvas
+    x = i = EOFCount = maxEOF = 0
     for image in images:
         if image[1]: # is_animated attribut
             maxEOF += 1
@@ -52,13 +49,6 @@ def combineImages(canvas, images):
                     exceptCount += 1
                     print("EOFError, count={}, maxEOF={}, len(images)={}".format(str(exceptCount),str(maxEOF),str(len(images))))
             
-            print("Paste image")
-            
-            # Only rotate animated images, as non animated have been rotated
-#             if image[1]:
-#                 toPaste = rotate(image[0])
-#             else:
-#                 toPaste = image[0]
             toPaste = image[0]
             generated.paste(toPaste, (x,0))
             x += toPaste.width
@@ -67,8 +57,7 @@ def combineImages(canvas, images):
         print("Saving frame {}...".format(str(i)))
         generated.save('/tmp/{},{}.png'.format(str(x),str(i)))
         
-        EOFCount = 0
-        x = 0
+        EOFCount = x = 0
         i += 1
         
         # To avoid waiting for an eternity... (dev)
