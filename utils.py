@@ -9,6 +9,8 @@ def is_animated(im):
         return False
 
 def rotate(im):
+    # Rotate the image using the EXIF data.
+    
     # The following lines are used to bypass a bug in the Pillow library.
     # This fixes:
     #    [...]
@@ -30,37 +32,74 @@ def rotate(im):
     
     return ImageOps.exif_transpose(im)
 
-def combineImages(canvas, images):    
+def resize(im, CANVAS_ATT):
+    # Resize using the ratio between the image and grid cell
+    ratioW = im.width / CANVAS_ATT["C_WIDTH"]
+    ratioH = im.height / CANVAS_ATT["C_HEIGHT"]
+    
+    if (ratioW > ratioH):
+        height = im.height/ratioW
+        width = CANVAS_ATT["C_WIDTH"]
+    else:
+        width = im.width/ratioH
+        height = CANVAS_ATT["C_HEIGHT"]
+    
+    height = int(round(height))
+    width = int(round(width))
+    return im.resize((width, height))
+
+def center(im, CANVAS_ATT, dx, dy):
+    # Delta from top-left corner is required to correctly position image.
+    return (int(round((CANVAS_ATT["C_WIDTH"]/2)-(im.width/2)+dx)),int(round((CANVAS_ATT["C_HEIGHT"]/2)-(im.height/2)+dy)))
+
+def combineImages(canvas, images, CANVAS_ATT):    
     # Combine images on the canvas
-    x = i = EOFCount = maxEOF = 0
+    i = EOFCount = maxEOF = 0
     for image in images:
         if image[1]: # is_animated attribut
             maxEOF += 1
+    
+    # Do not allow EOF when no animated images are present
+    if maxEOF == 0:
+        EOFCount = -1
+    
+    # While there are frames left to draw…
     while not EOFCount >= maxEOF:
         generated = canvas.copy()
         
-        for image in images:
-            if image[1]: # is_animated attribut
+        j = 0
+        for row in range(0, CANVAS_ATT["ROWS"]):
+            for col in range(0, CANVAS_ATT["COLS"]):         
+                dx = col*CANVAS_ATT["C_WIDTH"]
+                dy = row*CANVAS_ATT["C_HEIGHT"]
                 try:
-                    # Try to seek each animated image
-                    image[0].seek(i)
-                except EOFError:
-                    image[0].seek(0)
-                    exceptCount += 1
-                    print("EOFError, count={}, maxEOF={}, len(images)={}".format(str(exceptCount),str(maxEOF),str(len(images))))
-            
-            toPaste = image[0]
-            generated.paste(toPaste, (x,0))
-            x += toPaste.width
+                    image = images[j]
+                    if image[1]: # is_animated attribut
+                        try:
+                            # Try to seek each animated image
+                            image[0].seek(i)
+                        except EOFError:
+                            image[0].seek(0)
+                            exceptCount += 1
+                            print("EOFError, count={}, maxEOF={}, len(images)={}".format(str(exceptCount),str(maxEOF),str(len(images))))
+                    
+                    toPaste = image[0]
+                    toPaste = resize(toPaste, CANVAS_ATT) # Resize image for it to be able to fit in a cell
+                    generated.paste(toPaste, center(toPaste, CANVAS_ATT, dx, dy)) # Paste the image in the center of the cell
+                except IndexError:
+                    # No images left to draw…
+                    pass
+                
+                j += 1
         
-        # Save frames here to avoid memory exhaustion
+        # Save frames here to avoid possible memory exhaustion
         print("Saving frame {}...".format(str(i)))
-        generated.save('/tmp/{},{}.png'.format(str(x),str(i)))
+        generated.save('/tmp/{},{},{}.png'.format(str(dx),str(dy),str(i)))
         
         EOFCount = x = 0
         i += 1
         
-        # To avoid waiting for an eternity... (dev)
+        # To avoid waiting for an eternity… (dev)
         if i > 10:
             break
     # Overlay the images with the text (black with 0.5 alpha) "HaHa" for the first image, "Yes" for the second, "No" for the third... (iMessage reactions)
