@@ -6,15 +6,24 @@ from os.path import isfile, join
 from utils import is_animated, rotate, combineImages
 
 ROOT_DIR = 'images' # Directory containing subdirectories with images
-TEXT_OVERLAY = ['Love', 'Like', 'Dislike', 'Haha', '!!', '?'] # iMessage reactions
+TEXT_OVERLAY = ['Love', 'Like', 'Dislike', 'Haha', '!!', '?'] # Overlays to apply on the images, in this case: iMessage reactions
 
 # Canvas parameters
 CANVAS_ATT = {}
+CANVAS_ATT["FONT"] = {}
+
 CANVAS_ATT["MODE"]     = 'RGB'
 CANVAS_ATT["COLOR"]    = 0
 CANVAS_ATT["COLS"]     = 3    # Number of colums
 CANVAS_ATT["WIDTH"]    = 500  # Total width
 CANVAS_ATT["C_HEIGHT"] = 200  # Cell height
+
+CANVAS_ATT["FONT"]["FILE"] = 'Jost-Regular.ttf' # TrueType/OpenType font
+CANVAS_ATT["FONT"]["SIZE"] = 13 # Size in points, this should be set in proportion to the cell size
+CANVAS_ATT["FONT"]["COLOR"] = 255 # Fill color of the font
+CANVAS_ATT["FONT"]["S_COLOR"] = 0 # Color of the text stroke
+CANVAS_ATT["FONT"]["S_WIDTH"] = 1 # Width of the text stroke
+
 CANVAS_ATT["ROWS"] = None
 CANVAS_ATT["HEIGHT"] = None
 CANVAS_ATT["C_WIDTH"] = CANVAS_ATT["WIDTH"]/CANVAS_ATT["COLS"]
@@ -32,17 +41,15 @@ for root, dirs, _ in walk(ROOT_DIR):
         images = []
         for file in listdir(dir):
             file = join(dir, file)
-            print("current file: "+str(file)) # Debug
             try:
                 images.append(Image.open(file))
             except OSError:
                 # Ignore non image files
-                print("-- Not image") # Debug
                 pass
         
         CANVAS_ATT["ROWS"] = math.ceil(len(images)/CANVAS_ATT["COLS"])
         CANVAS_ATT["HEIGHT"] = CANVAS_ATT["ROWS"]*CANVAS_ATT["C_HEIGHT"]
-        print(CANVAS_ATT)
+        print(CANVAS_ATT) # Debug
         
         # Rotate non-animated images and add attribute to tell if animated
         taggedImages = []
@@ -56,4 +63,4 @@ for root, dirs, _ in walk(ROOT_DIR):
         # Create a canvas image that will contain the other images
         canvas = Image.new(CANVAS_ATT["MODE"], (CANVAS_ATT["WIDTH"], CANVAS_ATT["HEIGHT"]), CANVAS_ATT["COLOR"])
         
-        combineImages(canvas, taggedImages, CANVAS_ATT)
+        combineImages(canvas, taggedImages, CANVAS_ATT, TEXT_OVERLAY)

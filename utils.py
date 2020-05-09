@@ -1,4 +1,4 @@
-from PIL import Image, ImageOps
+from PIL import Image, ImageOps, ImageDraw, ImageFont
 
 def is_animated(im):
     try:
@@ -52,7 +52,13 @@ def center(im, CANVAS_ATT, dx, dy):
     # Delta from top-left corner is required to correctly position image.
     return (int(round((CANVAS_ATT["C_WIDTH"]/2)-(im.width/2)+dx)),int(round((CANVAS_ATT["C_HEIGHT"]/2)-(im.height/2)+dy)))
 
-def combineImages(canvas, images, CANVAS_ATT):    
+def textOverlay(draw, CANVAS_ATT, font, dx, dy, text):
+    x = dx+2
+    y = dy+2
+    
+    return draw.text((x, y), text, fill=CANVAS_ATT["FONT"]["COLOR"], font=font, stroke_width=CANVAS_ATT["FONT"]["S_WIDTH"], stroke_fill=CANVAS_ATT["FONT"]["S_COLOR"])
+
+def combineImages(canvas, images, CANVAS_ATT, TEXT_OVERLAY):    
     # Combine images on the canvas
     i = EOFCount = maxEOF = 0
     for image in images:
@@ -63,9 +69,13 @@ def combineImages(canvas, images, CANVAS_ATT):
     if maxEOF == 0:
         EOFCount = -1
     
+    # Load font
+    font = ImageFont.truetype(CANVAS_ATT["FONT"]["FILE"], CANVAS_ATT["FONT"]["SIZE"])
+    
     # While there are frames left to draw…
     while not EOFCount >= maxEOF:
         generated = canvas.copy()
+        draw = ImageDraw.Draw(generated)
         
         j = 0
         for row in range(0, CANVAS_ATT["ROWS"]):
@@ -86,6 +96,11 @@ def combineImages(canvas, images, CANVAS_ATT):
                     toPaste = image[0]
                     toPaste = resize(toPaste, CANVAS_ATT) # Resize image for it to be able to fit in a cell
                     generated.paste(toPaste, center(toPaste, CANVAS_ATT, dx, dy)) # Paste the image in the center of the cell
+                    try:
+                        textOverlay(draw, CANVAS_ATT, font, dx, dy, TEXT_OVERLAY[j])
+                    except IndexError:
+                        # No text to overlay…
+                        pass
                 except IndexError:
                     # No images left to draw…
                     pass
@@ -93,6 +108,7 @@ def combineImages(canvas, images, CANVAS_ATT):
                 j += 1
         
         # Save frames here to avoid possible memory exhaustion
+        # No need to combine draw and generated, as ImageDraw modifies the image inplace
         print("Saving frame {}...".format(str(i)))
         generated.save('/tmp/{},{},{}.png'.format(str(dx),str(dy),str(i)))
         
