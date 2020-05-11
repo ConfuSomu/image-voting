@@ -6,6 +6,7 @@ from os.path import isfile, join
 from utils import is_animated, rotate, combineImages
 
 ROOT_DIR = 'images' # Directory containing subdirectories with images
+FILE_FMT = '{root}/{subdir} - {frame}.png' # Format string for output image
 TEXT_OVERLAY = ['Love', 'Like', 'Dislike', 'Haha', '!!', '?'] # Overlays to apply on the images, in this case: iMessage reactions
 
 # Canvas parameters
@@ -63,4 +64,4 @@ for root, dirs, _ in walk(ROOT_DIR):
         # Create a canvas image that will contain the other images
         canvas = Image.new(CANVAS_ATT["MODE"], (CANVAS_ATT["WIDTH"], CANVAS_ATT["HEIGHT"]), CANVAS_ATT["COLOR"])
         
-        combineImages(canvas, taggedImages, CANVAS_ATT, TEXT_OVERLAY)
+        combineImages(canvas, taggedImages, CANVAS_ATT, TEXT_OVERLAY, [FILE_FMT, [root, subdir]])

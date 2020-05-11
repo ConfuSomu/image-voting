@@ -58,7 +58,15 @@ def textOverlay(draw, CANVAS_ATT, font, dx, dy, text):
     
     return draw.text((x, y), text, fill=CANVAS_ATT["FONT"]["COLOR"], font=font, stroke_width=CANVAS_ATT["FONT"]["S_WIDTH"], stroke_fill=CANVAS_ATT["FONT"]["S_COLOR"])
 
-def combineImages(canvas, images, CANVAS_ATT, TEXT_OVERLAY):    
+def save(im, file, frame):
+    FILE_FMT = file[0]
+    DIRS = file[1]
+    frame = str(frame)
+    
+    print("Saving frame {}...".format(frame))
+    im.save(FILE_FMT.format(root=DIRS[0], subdir=DIRS[1], frame=frame))
+
+def combineImages(canvas, images, CANVAS_ATT, TEXT_OVERLAY, SAVING):
     # Combine images on the canvas
     i = EOFCount = maxEOF = 0
     for image in images:
@@ -109,8 +117,7 @@ def combineImages(canvas, images, CANVAS_ATT, TEXT_OVERLAY):
         
         # Save frames here to avoid possible memory exhaustion
         # No need to combine draw and generated, as ImageDraw modifies the image inplace
-        print("Saving frame {}...".format(str(i)))
-        generated.save('/tmp/{},{},{}.png'.format(str(dx),str(dy),str(i)))
+        save(generated, SAVING, i)
         
         EOFCount = x = 0
         i += 1
