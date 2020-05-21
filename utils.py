@@ -85,7 +85,7 @@ def combineImages(canvas, images, CANVAS_ATT, TEXT_OVERLAY, SAVING):
         generated = canvas.copy()
         draw = ImageDraw.Draw(generated)
         
-        j = 0
+        EOFCount = j = 0
         for row in range(0, CANVAS_ATT["ROWS"]):
             for col in range(0, CANVAS_ATT["COLS"]):         
                 dx = col*CANVAS_ATT["C_WIDTH"]
@@ -98,8 +98,8 @@ def combineImages(canvas, images, CANVAS_ATT, TEXT_OVERLAY, SAVING):
                             image[0].seek(i)
                         except EOFError:
                             image[0].seek(0)
-                            exceptCount += 1
-                            print("EOFError, count={}, maxEOF={}, len(images)={}".format(str(exceptCount),str(maxEOF),str(len(images))))
+                            EOFCount += 1
+                            print("EOFError, count={}, maxEOF={}, len(images)={}".format(str(EOFCount),str(maxEOF),str(len(images))))
                     
                     toPaste = image[0]
                     toPaste = resize(toPaste, CANVAS_ATT) # Resize image for it to be able to fit in a cell
@@ -119,7 +119,7 @@ def combineImages(canvas, images, CANVAS_ATT, TEXT_OVERLAY, SAVING):
         # No need to combine draw and generated, as ImageDraw modifies the image inplace
         save(generated, SAVING, i)
         
-        EOFCount = x = 0
+        x = 0
         i += 1
         
         # To avoid waiting for an eternity… (dev)
