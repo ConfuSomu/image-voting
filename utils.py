@@ -1,4 +1,5 @@
 from PIL import Image, ImageOps, ImageDraw, ImageFont
+import subprocess
 
 def is_animated(im):
     try:
@@ -61,7 +62,7 @@ def textOverlay(draw, CANVAS_ATT, font, dx, dy, text):
 def save(im, file, frame):
     FILE_FMT = file[0]
     DIRS = file[1]
-    frame = str(frame)
+    frame = str(frame).zfill(4)
     
     print("Saving frame {}...".format(frame))
     im.save(FILE_FMT.format(root=DIRS[0], subdir=DIRS[1], frame=frame))
@@ -125,5 +126,23 @@ def combineImages(canvas, images, CANVAS_ATT, TEXT_OVERLAY, SAVING):
         # To avoid waiting for an eternity… (dev)
         if i > 10:
             break
-    # Overlay the images with the text (black with 0.5 alpha) "HaHa" for the first image, "Yes" for the second, "No" for the third... (iMessage reactions)
-    # Save the image as a TIFF with the dir's name and current frame number
+        
+    return i # Total frames (with 0 as the first frame)
+
+def animate(frames, fps, FFMPEG, CANVAS_ATT, SAVING):
+    IMAGE_FILE_FMT = SAVING[0]
+    DIRS = SAVING[1]
+    
+    inputImages = IMAGE_FILE_FMT.format(root=DIRS[0], subdir=DIRS[1], frame='%04d')
+    resolution = '{}x{}'.format(CANVAS_ATT["WIDTH"], CANVAS_ATT["HEIGHT"])
+    outputFile = FFMPEG["FILENAME"].format(root=DIRS[0], subdir=DIRS[1])
+    startFrame = 0
+    
+    args = [FFMPEG["FFMPEG"], '-nostdin', '-y',
+            '-framerate', str(fps), '-i', inputImages,
+            '-start_number', str(startFrame), '-vframes', str(frames),
+            '-s', resolution, '-r', FFMPEG["FPS"],
+            '-vcodec', FFMPEG["CODEC"], outputFile]
+    
+    proc = subprocess.run(args, capture_output=True, check = True)
+    print(proc) # Debug
