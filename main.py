@@ -4,7 +4,7 @@ from PIL import Image
 import math
 from os import walk, listdir
 from os.path import isfile, join
-from utils import is_animated, rotate, combineImages, animate
+from utils import is_animated, rotate, combineImages, animate, getFps, avgFps
 
 ROOT_DIR = 'images' # Directory containing subdirectories with images
 #FILE_FMT = '{root}/{subdir} - {frame}.png' # Format string for output image
@@ -66,9 +66,9 @@ for root, dirs, _ in walk(ROOT_DIR):
         taggedImages = []
         for image in images:
             if not is_animated(image):
-                taggedImages.append([rotate(image), False]) # Append rotated image
+                taggedImages.append([rotate(image), False, None]) # Append rotated image
             else:
-                taggedImages.append([image, True]) # Append original image
+                taggedImages.append([image, True, getFps(image)]) # Append original image
         del images # Unused
         
         # Create a canvas image that will contain the other images
@@ -79,5 +79,5 @@ for root, dirs, _ in walk(ROOT_DIR):
         # If multiple frames have been created,
         # Than create a video file…
         if frames > 1:
-            fps = 4 # Replace with function to get the average fps of each image
+            fps = avgFps(taggedImages)
             animate(frames, fps, FFMPEG, CANVAS_ATT, [FILE_FMT, [root, subdir]])

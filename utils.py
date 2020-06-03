@@ -59,6 +59,30 @@ def textOverlay(draw, CANVAS_ATT, font, dx, dy, text):
     
     return draw.text((x, y), text, fill=CANVAS_ATT["FONT"]["COLOR"], font=font, stroke_width=CANVAS_ATT["FONT"]["S_WIDTH"], stroke_fill=CANVAS_ATT["FONT"]["S_COLOR"])
 
+def getFps(im):
+    # Based on https://stackoverflow.com/a/53365469
+    im.seek(0)
+    frames = duration = 0
+    
+    while True:
+        try:
+            frames += 1
+            duration += im.info['duration']
+            im.seek(frames)
+        except EOFError:
+            im.seek(0)
+            return frames/duration*1000
+
+def avgFps(images):
+    numAnim = total = 0
+    
+    for image in images:
+        if image[1] and image[2] is not None: # is_animated and fps attribute
+            numAnim += 1
+            total += image[2]
+    
+    return total/numAnim
+
 def save(im, file, frame):
     FILE_FMT = file[0]
     DIRS = file[1]
