@@ -4,7 +4,8 @@ from PIL import Image
 import math
 from os import walk, listdir
 from os.path import isfile, join
-from utils import is_animated, rotate, combineImages, animate, getFps, avgFps
+from image import is_animated, rotate, combineImages
+from video import animate, getFps, avgFps
 
 ROOT_DIR = 'images' # Directory containing subdirectories with images
 #FILE_FMT = '{root}/{subdir} - {frame}.png' # Format string for output image
