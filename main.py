@@ -9,9 +9,10 @@ from image import is_animated, rotate, combineImages
 from video import animate, getFps, avgFps
 
 # Load configuration
-CONFIG = config.general()
-CANVAS_ATT = config.canvas()
-FFMPEG = config.ffmpeg()
+args = config.args()
+CONFIG = config.general(args)
+CANVAS_ATT = config.canvas(args)
+FFMPEG = config.ffmpeg(args)
 
 # Walk in subdirectories (jour 1, jour 2, ...)
 for root, dirs, _ in walk(CONFIG["ROOT_DIR"]):

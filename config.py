@@ -1,12 +1,20 @@
-def general():
+import argparse
+
+def args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-d', '--directory', default="images",
+                        help="Directory containing images")
+    return parser.parse_args()
+
+def general(args):
     conf = {}
-    conf["ROOT_DIR"] = 'images' # Directory containing subdirectories with images
+    conf["ROOT_DIR"] = args.directory # Directory containing subdirectories with images
     #conf["FILE_FMT"] = '{root}/{subdir} - {frame}.png' # Format string for output image
     conf["FILE_FMT"] = '/tmp/{root}/{subdir} - {frame}.png' # Format string for output image
     conf["TEXT_OVERLAY"] = ['Love', 'Like', 'Dislike', 'Haha', '!!', '?'] # Overlays to apply on the images, in this case: iMessage reactions
     return conf
 
-def canvas():
+def canvas(args):
     conf = {}
     conf["FONT"] = {}
 
@@ -27,7 +35,7 @@ def canvas():
     conf["C_WIDTH"] = conf["WIDTH"]/conf["COLS"]
     return conf
 
-def ffmpeg():
+def ffmpeg(args):
     conf = {}
     conf["FFMPEG"] = 'ffmpeg' # Location of the ffmpeg binary
     conf["CODEC"] = 'ffv1' # Codec to use for the generated video, prefer a lossless one for better fidelity
