@@ -10,9 +10,10 @@ from video import animate, getFps, avgFps
 
 # Load configuration
 args = config.args()
-CONFIG = config.general(args)
-CANVAS_ATT = config.canvas(args)
-FFMPEG = config.ffmpeg(args)
+userconf = config.user(args.config)
+CONFIG = config.general(args, userconf)
+CANVAS_ATT = config.canvas(args, userconf)
+FFMPEG = config.ffmpeg(args, userconf)
 
 # Walk in subdirectories (jour 1, jour 2, ...)
 for root, dirs, _ in walk(CONFIG["ROOT_DIR"]):
