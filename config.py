@@ -50,7 +50,9 @@ def canvas(args, userconf):
     conf["C_WIDTH"] = conf["WIDTH"]/conf["COLS"]
     
     try:
-        return {**conf, **userconf['canvas']}
+        modified = {**conf, **userconf['canvas']}
+        modified["FONT"] = {**conf["FONT"], **userconf['canvas']["FONT"]}
+        return modified
     except KeyError:
         return conf
 
