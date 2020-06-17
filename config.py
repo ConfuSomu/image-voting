@@ -47,13 +47,21 @@ def canvas(args, userconf):
 
     conf["ROWS"] = None
     conf["HEIGHT"] = None
-    conf["C_WIDTH"] = conf["WIDTH"]/conf["COLS"]
     
     try:
         modified = {**conf, **userconf['canvas']}
-        modified["FONT"] = {**conf["FONT"], **userconf['canvas']["FONT"]}
+        
+        try:
+            modified["FONT"] = {**conf["FONT"], **userconf['canvas']["FONT"]}
+        except KeyError:
+            # No font config has been defined in the config file, use the defaults.
+            modified["FONT"] = conf["FONT"]
+        
+        modified["C_WIDTH"] = modified["WIDTH"]/modified["COLS"]
         return modified
+        
     except KeyError:
+        conf["C_WIDTH"] = conf["WIDTH"]/conf["COLS"]
         return conf
 
 def ffmpeg(args, userconf):
