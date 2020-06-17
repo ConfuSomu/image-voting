@@ -2,7 +2,7 @@ import argparse, json
 
 def args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-d', '--directory', default="images",
+    parser.add_argument('-d', '--directory',
                         help="Directory containing images")
     parser.add_argument('-c', '--config',
                         help="Configuration file")
@@ -20,14 +20,24 @@ def user(filename):
 
 def general(args, userconf):
     default = {}
-    default["ROOT_DIR"] = args.directory # Directory containing subdirectories with images
     default["FILE_FMT"] = '{root}/{subdir} - {frame}.png' # Format string for output image
     default["TEXT_OVERLAY"] = ['Love', 'Like', 'Dislike', 'Haha', '!!', '?'] # Overlays to apply on the images, in this case: iMessage reactions
     
+    # Apply configuration file…
     try:
-        return {**default, **userconf['general']}
+        conf = {**default, **userconf['general']}
     except KeyError:
-        return default
+        conf = default
+    
+    # Then apply directory name ontop…
+    if args.directory is not None:
+        # The priority is given to the program argument
+        conf["ROOT_DIR"] = args.directory
+    elif "ROOT_DIR" not in conf:
+        # Default is used when ROOT_DIR is not specified elsewhere
+        conf["ROOT_DIR"] = 'images'
+    
+    return conf
 
 def canvas(args, userconf):
     default = {}
