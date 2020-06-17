@@ -19,59 +19,59 @@ def user(filename):
         return {}
 
 def general(args, userconf):
-    conf = {}
-    conf["ROOT_DIR"] = args.directory # Directory containing subdirectories with images
-    conf["FILE_FMT"] = '{root}/{subdir} - {frame}.png' # Format string for output image
-    conf["TEXT_OVERLAY"] = ['Love', 'Like', 'Dislike', 'Haha', '!!', '?'] # Overlays to apply on the images, in this case: iMessage reactions
+    default = {}
+    default["ROOT_DIR"] = args.directory # Directory containing subdirectories with images
+    default["FILE_FMT"] = '{root}/{subdir} - {frame}.png' # Format string for output image
+    default["TEXT_OVERLAY"] = ['Love', 'Like', 'Dislike', 'Haha', '!!', '?'] # Overlays to apply on the images, in this case: iMessage reactions
     
     try:
-        return {**conf, **userconf['general']}
+        return {**default, **userconf['general']}
     except KeyError:
-        return conf
+        return default
 
 def canvas(args, userconf):
-    conf = {}
-    conf["FONT"] = {}
+    default = {}
+    default["FONT"] = {}
 
-    conf["MODE"]     = 'RGB'
-    conf["COLOR"]    = 0
-    conf["COLS"]     = 3    # Number of colums
-    conf["WIDTH"]    = 500  # Total width
-    conf["C_HEIGHT"] = 200  # Cell height
+    default["MODE"]     = 'RGB'
+    default["COLOR"]    = 0
+    default["COLS"]     = 3    # Number of colums
+    default["WIDTH"]    = 500  # Total width
+    default["C_HEIGHT"] = 200  # Cell height
 
-    conf["FONT"]["FILE"] = 'Jost-Regular.ttf' # TrueType/OpenType font
-    conf["FONT"]["SIZE"] = 13 # Size in points, this should be set in proportion to the cell size
-    conf["FONT"]["COLOR"] = 255 # Fill color of the font
-    conf["FONT"]["S_COLOR"] = 0 # Color of the text stroke
-    conf["FONT"]["S_WIDTH"] = 1 # Width of the text stroke
+    default["FONT"]["FILE"] = 'Jost-Regular.ttf' # TrueType/OpenType font
+    default["FONT"]["SIZE"] = 13 # Size in points, this should be set in proportion to the cell size
+    default["FONT"]["COLOR"] = 255 # Fill color of the font
+    default["FONT"]["S_COLOR"] = 0 # Color of the text stroke
+    default["FONT"]["S_WIDTH"] = 1 # Width of the text stroke
 
-    conf["ROWS"] = None
-    conf["HEIGHT"] = None
+    default["ROWS"] = None
+    default["HEIGHT"] = None
     
     try:
-        modified = {**conf, **userconf['canvas']}
+        conf = {**default, **userconf['canvas']}
         
         try:
-            modified["FONT"] = {**conf["FONT"], **userconf['canvas']["FONT"]}
+            conf["FONT"] = {**default["FONT"], **userconf['canvas']["FONT"]}
         except KeyError:
-            # No font config has been defined in the config file, use the defaults.
-            modified["FONT"] = conf["FONT"]
+            # No font config has been defined in the config file, use the default.
+            conf["FONT"] = default["FONT"]
         
-        modified["C_WIDTH"] = modified["WIDTH"]/modified["COLS"]
-        return modified
-        
-    except KeyError:
         conf["C_WIDTH"] = conf["WIDTH"]/conf["COLS"]
         return conf
+        
+    except KeyError:
+        default["C_WIDTH"] = default["WIDTH"]/default["COLS"]
+        return default
 
 def ffmpeg(args, userconf):
-    conf = {}
-    conf["FFMPEG"] = 'ffmpeg' # Location of the ffmpeg binary
-    conf["CODEC"] = 'ffv1' # Codec to use for the generated video, prefer a lossless one for better fidelity
-    conf["FILENAME"] = '{root}/{subdir}.avi' # Filename format string
-    conf["FPS"] = '30' # FPS of the resulting video file
+    default = {}
+    default["FFMPEG"] = 'ffmpeg' # Location of the ffmpeg binary
+    default["CODEC"] = 'ffv1' # Codec to use for the generated video, prefer a lossless one for better fidelity
+    default["FILENAME"] = '{root}/{subdir}.avi' # Filename format string
+    default["FPS"] = '30' # FPS of the resulting video file
     
     try:
-        return {**conf, **userconf['ffmpeg']}
+        return {**default, **userconf['ffmpeg']}
     except KeyError:
-        return conf
+        return default
