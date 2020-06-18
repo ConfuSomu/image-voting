@@ -1,0 +1,34 @@
+{
+  "general": {
+    "ROOT_DIR": "images",
+    "FILE_FMT": "/tmp/{root}/{subdir} - {frame}.png",
+    "TEXT_OVERLAY": [
+      "Love",
+      "Like",
+      "Dislike",
+      "Haha",
+      "!!",
+      "?"
+    ]
+  },
+  "canvas": {
+    "FONT": {
+      "FILE": "Jost-Regular.ttf",
+      "SIZE": 13,
+      "COLOR": 255,
+      "S_COLOR": 0,
+      "S_WIDTH": 1
+    },
+    "MODE": "RGB",
+    "COLOR": 0,
+    "COLS": 3,
+    "WIDTH": 500,
+    "C_HEIGHT": 200
+  },
+  "ffmpeg": {
+    "FFMPEG": "ffmpeg",
+    "CODEC": "ffv1",
+    "FILENAME": "/tmp/{root}/{subdir}.avi",
+    "FPS": "30"
+  }
+}
