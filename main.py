@@ -50,7 +50,7 @@ for root, dirs, _ in walk(CONFIG["ROOT_DIR"]):
         # Create a canvas image that will contain the other images
         canvas = Image.new(CANVAS_ATT["MODE"], (CANVAS_ATT["WIDTH"], CANVAS_ATT["HEIGHT"]), CANVAS_ATT["COLOR"])
         
-        frames = combineImages(canvas, taggedImages, CANVAS_ATT, CONFIG["TEXT_OVERLAY"], [CONFIG["FILE_FMT"], [root, subdir]])
+        frames = combineImages(canvas, taggedImages, CANVAS_ATT, CONFIG["TEXT_OVERLAY"], [CONFIG["FILE_FMT"], [root, subdir]], CONFIG["MAX_ITERATIONS"])
         
         # If multiple frames have been created,
         # Than create a video file…

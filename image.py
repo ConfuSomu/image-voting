@@ -66,7 +66,7 @@ def save(im, file, frame):
     print("Saving frame {}...".format(frame))
     im.save(FILE_FMT.format(root=DIRS[0], subdir=DIRS[1], frame=frame))
 
-def combineImages(canvas, images, CANVAS_ATT, TEXT_OVERLAY, SAVING):
+def combineImages(canvas, images, CANVAS_ATT, TEXT_OVERLAY, SAVING, MAX_ITERATIONS):
     # Combine images on the canvas
     i = EOFCount = maxEOF = 0
     for image in images:
@@ -122,8 +122,8 @@ def combineImages(canvas, images, CANVAS_ATT, TEXT_OVERLAY, SAVING):
         x = 0
         i += 1
         
-        # To avoid waiting for an eternity… (dev)
-        if i > 10:
+        # To avoid waiting for an eternity, useful when devloping.
+        if MAX_ITERATIONS != -1 and i >= MAX_ITERATIONS:
             break
         
     return i # Total frames (with 0 as the first frame)

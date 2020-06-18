@@ -4,6 +4,8 @@ def args():
     parser = argparse.ArgumentParser()
     parser.add_argument('-d', '--directory',
                         help="Directory containing images")
+    parser.add_argument('--iterations', default=-1, type=int,
+                        help="Maximum number of frames generated when combining animated images. Setting the limit will generate the frames from 0 to (limit-1).")
     parser.add_argument('-c', '--config',
                         help="Configuration file")
     return parser.parse_args()
@@ -36,6 +38,8 @@ def general(args, userconf):
     elif "ROOT_DIR" not in conf:
         # Default is used when ROOT_DIR is not specified elsewhere
         conf["ROOT_DIR"] = 'images'
+    
+    conf["MAX_ITERATIONS"] = args.iterations
     
     return conf
 
